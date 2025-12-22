@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AniStream - Watch Popular Anime</title>
+    <style>
+        /* --- Variables & Reset --- */
+:root {
+    --primary-bg: #0f0f1a;       /* Very dark purple/black */
+    --secondary-bg: #1a1a2e;     /* Slightly lighter purple for cards */
+    --accent-color: #00f2ea;     /* Neon Cyan/Teal */
+    --accent-hover: #00c2bb;
+    --text-main: #ffffff;
+    --text-muted: #a0a0b0;
+    --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--primary-bg);
+    color: var(--text-main);
+    font-family: var(--font-main);
+}
+
+a { text-decoration: none; color: inherit; transition: 0.3s; }
+ul { list-style: none; }
+
+/* --- Navbar --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 4%;
+    background: rgba(15, 15, 26, 0.95);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-main);
+    letter-spacing: 1px;
+}
+
+.logo .dot { color: var(--accent-color); font-size: 2.5rem; line-height: 0; }
+
+.nav-links { display: flex; gap: 2rem; }
+.nav-links a { color: var(--text-muted); font-weight: 500; font-size: 1rem; }
+.nav-links a:hover, .nav-links a.active { color: var(--accent-color); }
+
+.nav-actions { display: flex; gap: 1.5rem; align-items: center; }
+.nav-actions i { font-size: 1.2rem; cursor: pointer; color: var(--text-main); }
+.nav-actions i:hover { color: var(--accent-color); }
+
+.login-btn {
+    background: transparent;
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-btn:hover { background: var(--accent-color); color: var(--primary-bg); }
+
+/* --- Hero Section --- */
+.hero {
+    height: 70vh;
+    background: url('https://placehold.co/1920x1080/2a2a3e/FFF?text=Featured+Anime+Wallpaper') center/cover no-repeat;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0 4%;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    /* Gradient fade from left to right */
+    background: linear-gradient(90deg, #0f0f1a 30%, rgba(15, 15, 26, 0.6) 70%, transparent 100%);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 600px;
+}
+
+.hero-content .tag {
+    background: var(--accent-color);
+    color: var(--primary-bg);
+    padding: 0.3rem 0.8rem;
+    border-radius: 2px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.hero-content h1 {
+    font-size: 4rem;
+    margin: 1rem 0;
+    line-height: 1.1;
+}
+
+.hero-content p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.hero-buttons { display: flex; gap: 1rem; }
+
+.btn-primary, .btn-secondary {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: 0.3s;
+}
+
+.btn-primary { background: var(--accent-color); color: var(--primary-bg); }
+.btn-primary:hover { background: var(--accent-hover); }
+
+.btn-secondary { background: rgba(255,255,255,0.1); color: var(--text-main); }
+.btn-secondary:hover { background: rgba(255,255,255,0.2); }
+
+/* --- Main Layout --- */
+.container { padding: 4rem 4%; }
+
+.category { margin-bottom: 4rem; }
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    margin-bottom: 1.5rem;
+    border-left: 5px solid var(--accent-color);
+    padding-left: 1rem;
+}
+
+.view-all { color: var(--accent-color); font-weight: bold; font-size: 0.9rem; }
+
+/* --- Anime Grid --- */
+.anime-grid {
+    display: grid;
+    /* Responsive grid: min 200px width per card */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.anime-card {
+    background: transparent;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.anime-card:hover .image-wrapper img {
+    transform: scale(1.05);
+    opacity: 0.7;
+}
+
+.anime-card:hover h3 { color: var(--accent-color); }
+
+.image-wrapper {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 2/3; /* Standard poster ratio */
+    margin-bottom: 0.8rem;
+    background: #000;
+}
+
+.image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.4s;
+}
+
+.hover-play {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    color: var(--text-main);
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.anime-card:hover .hover-play { opacity: 1; }
+
+.episode-badge {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: rgba(0,0,0,0.8);
+    color: var(--accent-color);
+    padding: 0.2rem 0.5rem;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.card-info h3 {
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0.3rem;
+}
+
+.card-info .genre {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* --- Footer --- */
+footer {
+    background: var(--secondary-bg);
+    padding: 3rem 4%;
+    text-align: center;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.footer-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--text-main);
+}
+
+.socials {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.socials i { font-size: 1.5rem; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
+.socials i:hover { color: var(--accent-color); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">AniStream <span class="dot">.</span></div>
+        <ul class="nav-links">
+            <li><a href="#" class="active">Home</a></li>
+            <li><a href="#">Simulcasts</a></li>
+            <li><a href="#">Manga</a></li>
+            <li><a href="#">News</a></li>
+        </ul>
+        <div class="nav-actions">
+            <i class="fas fa-search"></i>
+            <i class="fas fa-bookmark"></i>
+            <button class="login-btn">Log In</button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <span class="tag">Trending Now</span>
+            <h1>Kaiju No. 8</h1>
+            <p>In a world plagued by threatening creatures known as "Kaiju," Kafka Hibino aspires to enlist in the Defense Force to take them down.</p>
+            <div class="hero-buttons">
+                <button class="btn-primary"><i class="fas fa-play"></i> Start Watching</button>
+                <button class="btn-secondary"><i class="fas fa-plus"></i> Add to Watchlist</button>
+            </div>
+        </div>
+        <div class="hero-overlay"></div>
+    </header>
+
+    <main class="container">
+        
+        <section class="category">
+            <div class="category-header">
+                <h2>Top Hits This Week</h2>
+                <a href="#" class="view-all">View All</a>
+            </div>
+            <div class="anime-grid">
+                <div class="anime-card">
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/300x450/2a2a3e/FFF?text=One+Piece" alt="One Piece">
+                        <div class="hover-play"><i class="fas fa-play"></i></div>
+                    </div>
+                    <div class="card-info">
+                        <h3>One Piece</h3>
+                        <span class="genre">Adventure</span>
+                    </div>
+                </div>
+                <div class="anime-card">
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/300x450/2a2a3e/FFF?text=Jujutsu+Kaisen" alt="Jujutsu Kaisen">
+                        <div class="hover-play"><i class="fas fa-play"></i></div>
+                    </div>
+                    <div class="card-info">
+                        <h3>Jujutsu Kaisen</h3>
+                        <span class="genre">Action / Supernatural</span>
+                    </div>
+                </div>
+                <div class="anime-card">
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/300x450/2a2a3e/FFF?text=Demon+Slayer" alt="Demon Slayer">
+                        <div class="hover-play"><i class="fas fa-play"></i></div>
+                    </div>
+                    <div class="card-info">
+                        <h3>Demon Slayer</h3>
+                        <span class="genre">Fantasy</span>
+                    </div>
+                </div>
+                <div class="anime-card">
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/300x450/2a2a3e/FFF?text=Chainsaw+Man" alt="Chainsaw Man">
+                        <div class="hover-play"><i class="fas fa-play"></i></div>
+                    </div>
+                    <div class="card-info">
+                        <h3>Chainsaw Man</h3>
+                        <span class="genre">Dark Fantasy</span>
+                    </div>
+                </div>
+                <div class="anime-card">
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/300x450/2a2a3e/FFF?text=Spy+x+Family" alt="Spy x Family">
+                        <div class="hover-play"><i class="fas fa-play"></i></div>
+                    </div>
+                    <div class="card-info">
+                        <h3>Spy x Family</h3>
+                        <span class="genre">Slice of Life</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="category">
+            <div class="category-header">
+                <h2>Just Updated</h2>
+                <a href="#" class="view-all">View All</a>
+            </div>
+            <div class="anime-grid">
+                <div class="anime-card">
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/300x450/2a2a3e/FFF?text=Solo+Leveling" alt="Solo Leveling">
+                        <div class="episode-badge">Ep 12</div>
+                    </div>
+                    <div class="card-info">
+                        <h3>Solo Leveling</h3>
+                        <span class="genre">Action</span>
+                    </div>
+                </div>
+                <div class="anime-card">
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/300x450/2a2a3e/FFF?text=Blue+Lock" alt="Blue Lock">
+                        <div class="episode-badge">Ep 24</div>
+                    </div>
+                    <div class="card-info">
+                        <h3>Blue Lock</h3>
+                        <span class="genre">Sports</span>
+                    </div>
+                </div>
+                <div class="anime-card">
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/300x450/2a2a3e/FFF?text=Frieren" alt="Frieren">
+                        <div class="episode-badge">Ep 28</div>
+                    </div>
+                    <div class="card-info">
+                        <h3>Frieren</h3>
+                        <span class="genre">Adventure</span>
+                    </div>
+                </div>
+                <div class="anime-card">
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/300x450/2a2a3e/FFF?text=Mashle" alt="Mashle">
+                        <div class="episode-badge">Ep 8</div>
+                    </div>
+                    <div class="card-info">
+                        <h3>Mashle</h3>
+                        <span class="genre">Comedy</span>
+                    </div>
+                </div>
+                <div class="anime-card">
+                    <div class="image-wrapper">
+                        <img src="https://placehold.co/300x450/2a2a3e/FFF?text=Oshi+No+Ko" alt="Oshi No Ko">
+                        <div class="episode-badge">Ep 11</div>
+                    </div>
+                    <div class="card-info">
+                        <h3>Oshi No Ko</h3>
+                        <span class="genre">Drama</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">AniStream</div>
+            <p>&copy; 2024 AniStream. All rights reserved.</p>
+            <div class="socials">
+                <i class="fab fa-twitter"></i>
+                <i class="fab fa-instagram"></i>
+                <i class="fab fa-discord"></i>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
